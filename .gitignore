@@ -1,0 +1,13 @@
+# Dipendenze
+node_modules
+
+# Output di build Vite
+dist
+dist-ssr
+
+# Log
+*.log
+npm-debug.log*
+
+# File di sistema / editor
+.DS_Store
