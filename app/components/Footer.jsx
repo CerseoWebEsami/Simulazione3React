@@ -9,8 +9,8 @@ function Footer() {
       <div className="footer-content">
         <p>
           Countries Atlas | Dati da{' '}
-          <a href="https://restcountries.com" target="_blank" rel="noreferrer">
-            REST Countries
+          <a href="https://countries.dev" target="_blank" rel="noreferrer">
+            countries.dev
           </a>
         </p>
         <p>Ricerca, esplorazione per regione, preferiti e dashboard statistiche.</p>

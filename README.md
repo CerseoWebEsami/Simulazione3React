@@ -1,6 +1,6 @@
 # Countries Atlas
 
-Applicazione web React (Vite) che usa la REST API pubblica https://restcountries.com per cercare, esplorare e confrontare nazioni.
+Applicazione web React (Vite) che usa la REST API pubblica https://countries.dev per cercare, esplorare e confrontare nazioni.
 
 Porting React del progetto originale in Vanilla JavaScript, realizzato a partire dal template ufficiale del corso.
 

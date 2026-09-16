@@ -10,7 +10,7 @@ function Home() {
       <section className="hero page-section">
         <h2>Countries Atlas</h2>
         <p>
-          Applicazione didattica in React che usa restcountries.com per consultare nazioni, salvarle nei
+          Applicazione didattica in React che usa countries.dev per consultare nazioni, salvarle nei
           preferiti e analizzare statistiche globali.
         </p>
         <div className="quick-links">

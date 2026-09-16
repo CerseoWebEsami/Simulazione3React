@@ -1,7 +1,12 @@
 // api.js - Accesso endpoint REST Countries per ricercare e recuperare dati nazioni
+//
+// NOTA MIGRAZIONE: restcountries.com v3.1 e' stata deprecata e la v5 richiede
+// una API key (header Authorization: Bearer). Usiamo countries.dev, alternativa
+// gratuita e senza autenticazione che espone endpoint equivalenti
+// (/name, /capital, /region, /alpha/{code}, /countries al posto di /all).
 
-const API_BASE = 'https://restcountries.com/v3.1';
-const COUNTRY_FIELDS = ['name', 'cca3', 'capital', 'region', 'subregion', 'population', 'area', 'flags'].join(
+const API_BASE = 'https://countries.dev';
+const COUNTRY_FIELDS = ['name', 'alpha3Code', 'capital', 'region', 'subregion', 'population', 'area', 'flags'].join(
   ','
 );
 
@@ -51,10 +56,10 @@ function formatDensityLabel(density) {
  * console.log(country.density);  // 195.84
  */
 function mapCountry(rawCountry) {
-  const name = rawCountry?.name?.common || 'Sconosciuto';
-  const code = rawCountry?.cca3 || 'N/D';
-  const capital =
-    Array.isArray(rawCountry?.capital) && rawCountry.capital.length > 0 ? rawCountry.capital[0] : 'N/D';
+  const name = (typeof rawCountry?.name === 'string' ? rawCountry.name : rawCountry?.name?.common) || 'Sconosciuto';
+  const code = rawCountry?.alpha3Code || rawCountry?.cca3 || 'N/D';
+  const rawCapital = rawCountry?.capital;
+  const capital = Array.isArray(rawCapital) ? rawCapital[0] || 'N/D' : rawCapital || 'N/D';
   const region = rawCountry?.region || 'N/D';
   const subregion = rawCountry?.subregion || 'N/D';
   const population = Number(rawCountry?.population) || 0;
@@ -203,7 +208,7 @@ export async function getCountriesByRegion(region) {
  * console.log(allCountries.length); // ~250 nazioni
  */
 export async function getAllCountries() {
-  const url = `${API_BASE}/all?fields=${COUNTRY_FIELDS}`;
+  const url = `${API_BASE}/countries?fields=${COUNTRY_FIELDS}`;
   return requestCountryList(url, 'Errore nel caricamento globale');
 }
 
@@ -233,6 +238,13 @@ export async function getCountriesByCodes(codes) {
     return [];
   }
 
-  const url = `${API_BASE}/alpha?codes=${encodeURIComponent(cleanCodes.join(','))}&fields=${COUNTRY_FIELDS}`;
-  return requestCountryList(url, 'Errore nel recupero preferiti');
+  // countries.dev non offre un endpoint batch (/alpha?codes=...): interroghiamo
+  // /alpha/{code} per ogni codice in parallelo e uniamo i risultati.
+  const results = await Promise.all(
+    cleanCodes.map((code) =>
+      requestCountryList(`${API_BASE}/alpha/${code}?fields=${COUNTRY_FIELDS}`, 'Errore nel recupero preferiti')
+    )
+  );
+
+  return results.flat();
 }
